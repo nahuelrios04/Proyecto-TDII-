@@ -64,44 +64,7 @@ void ajustar_delay(char tecla)
 	current_delay += 50;
     }
 }
-/*
- * USADA ANTERIORMENTE EN LA VERSION 2
-void menu_secuencias() {
-    int opc = -1;
-    char input[10];
 
-    while (1) {
-        system("clear");
-        printf("-----------------------------------\n");
-        printf("=== CONTROL DEL SECUENCIAS LED ===\n");
-        printf("-----------------------------------\n");
-
-        for (int i = 0; i < NUM_SECUENCIAS; i++) {
-            printf("%d. %s\n", secuencias[i].id, secuencias[i].nombre);
-        }
-
-        printf("\n0. Salir\n");
-        printf("-----------------------------------\n");
-        printf("Seleccione una opcion (1-%d): ", NUM_SECUENCIAS);
-        fflush(stdout);
-
-        if (fgets(input, sizeof(input), stdin)) {
-            if (sscanf(input, "%d", &opc) == 1) {
-                if (opc >= 0 && opc <= NUM_SECUENCIAS) {
-                    printf("Eligio la secuencia %s\n", secuencias[opc - 1].nombre);
-                    break;
-                }
-            }
-        }
-        printf("Opcion invalida. Intente nuevamente.\n");
-        sleep(1);
-    }
-    if (opc != 0) {
-        secuencias[opc - 1].funcion();
-    }
-    
-}
-*/
 
 void el_auto_fantastico()
 {
@@ -501,7 +464,7 @@ void el_latido()
 		{
 		    digitalWrite(LED_PINS[led], (i < ciclo_pwm) ? HIGH : LOW);
 		}
-		delayMillis(current_delay * 10); // Ajuste fino con delayMicros
+		delayMillis(current_delay / 50); // Ajuste fino con delayMicros
 	    }
 
 	}
@@ -535,9 +498,6 @@ int chequeo()
 	    return 1;
 	}
 	ajustar_delay(tecla);
-	/*			VER				*/
-	//actualizar_estado("Ejecutando|Auto fantastico|Velocidad:%d",current_delay);
-
     }
     return 0;
 }

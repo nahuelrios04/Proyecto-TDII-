@@ -8,7 +8,8 @@
 static struct termios original_termios;
 
 // Configurar terminal en modo no canónico y sin eco
-void configurar_terminal() {
+void configurar_terminal()
+{
     struct termios new_termios;
     tcgetattr(STDIN_FILENO, &original_termios);
     new_termios = original_termios;
@@ -17,12 +18,14 @@ void configurar_terminal() {
 }
 
 // Restaurar configuración original
-void restaurar_terminal() {
+void restaurar_terminal() 
+{
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 }
 
 // Verificar si hay tecla presionada
-int kbhit() {
+int kbhit()
+{
     struct timeval tv = {0, 0};
     fd_set fds;
     FD_ZERO(&fds);
@@ -31,7 +34,8 @@ int kbhit() {
 }
 
 // Leer la tecla presionada
-char leer_tecla() {
+char leer_tecla() 
+{
     char c = 0;
     if (read(STDIN_FILENO, &c, 1) < 0) {
         perror("Error al leer tecla");

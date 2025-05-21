@@ -53,10 +53,10 @@ int main()
         tcsetattr(STDIN_FILENO, TCSANOW, &original_term);
         return 1;
     }
+    
     tcsetattr(STDIN_FILENO, TCSANOW, &original_term);
     pioInit();
     leds_init();
-    //serial_init();
     
     // Configuración inicial
     set_remote_mode(0); // Iniciar en modo local
@@ -74,57 +74,19 @@ int main()
             break;
         }else if(opcion <=NUM_SECUENCIAS && opcion > 0)
         {
-            secuencias[(mostrar_menu_secuencias())-1].funcion();
+            secuencias[opcion-1].funcion();
         }
         
 
     }
     
-    //serial_close();
     return 0;
 }
 
-// Procesar comandos recibidos
-/*
-void procesar_comando(char *cmd)
-{
-    if (strncmp(cmd, "V", 1) == 0)
-    { // Ajustar velocidad
-        int new_speed = atoi(cmd + 1);
-        if (new_speed >= 50 && new_speed <= 2000)
-        {
-            current_delay = new_speed;
-            printf("Velocidad cambiada a: %d ms\n", new_speed);
-        }
-    } 
-    else if (strncmp(cmd, "S", 1) == 0)
-    { // Seleccionar secuencia
-        int secuencia = atoi(cmd + 1);
-        if (secuencia >= 1 && secuencia <= NUM_SECUENCIAS)
-        {
-            apagar_todo();
-            secuencias[secuencia - 1].funcion();
-        }
-    }
-    else if (strcmp(cmd, "MODO_LOCAL") == 0)
-    {
-        set_remote_mode(0);
-    }
-}
-*/
+
 void restore_terminal(void)
 {
     tcsetattr(STDIN_FILENO, TCSANOW, &original_termios);
 }
 
-void terminal(void)
-{
-    struct termios original_term;
-    tcgetattr(STDIN_FILENO, &original_term);
-    
-    struct termios new_term = original_term;
-    new_term.c_lflag &= ~(ICANON & ~ECHO);
-    new_term.c_cc[VMIN] = 0;
-    new_term.c_cc[VTIME] = 0;
-    tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
-}
+

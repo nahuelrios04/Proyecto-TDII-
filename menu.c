@@ -66,63 +66,15 @@ int mostrar_menu_secuencias()
                     set_remote_mode(1);
                     break;
                 }
-            }else if(opc == 0) return 0;
-        }
+            }else if(opc == 0)
+            {
+                return 0;
+            }else return -1;
+        }else return -1;
         printf("Opcion invalida. Intente nuevamente.\n");
         sleep(1);
     }
+    return -1;
 }
 
-/*
-void actualizar_estado(const char* formato) 
-{
 
-    char buffer[100];
-    va_list args;
-    va_start(args,formato);
-    vsnprintf(buffer,sizeof(buffer),formato,args);
-    va_end(args);
-    
-    
-    if(remote_mode) {
-        char mensaje[120];
-        snprintf(mensaje,sizeof(mensaje), "ESTADO:%s\n", buffer);
-        serial_send(mensaje);
-    }
-    
-}
-
-void manejar_modo_remoto()
-{
-    
-    printf("Modo remoto activado\n");
-    actualizar_estado("Modo remoto|Menu principal");
-    
-    while(remote_mode)
-    {
-        char buffer[50];
-        int bytes = serial_receive(buffer,sizeof(buffer));
-        if(bytes > 0)
-        {
-            buffer[bytes]='\0';
-            if(strcmp(buffer,"Q\n") == 0)
-            {
-                set_remote_mode(0);
-            }else
-            {
-                printf("Comando recibido:%s\n",buffer);
-            }
-        }
-        
-        if(kbhit())
-        {
-            char tecla = getchar();
-            if(tecla == 'q' || tecla == 'Q')
-            {
-                set_remote_mode();
-            }
-        }
-    }
-    
-}
-*/
