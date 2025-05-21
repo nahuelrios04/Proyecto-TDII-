@@ -10,7 +10,6 @@
 
 // Prototipos
 int mostrar_menu_secuencias();
-//void manejar_modo_remoto();
-//void actualizar_estado(const char* formato);
+void mostrar_menu_remoto(void);
 
 #endif

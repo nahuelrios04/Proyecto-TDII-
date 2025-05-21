@@ -27,7 +27,7 @@
 #include "menu.h"
 
 ////////VARIABLES GLOBALES///////
-volatile int running = 1;
+int running = 1;
 extern SecuenciaMenu secuencias[];
 void procesar_comando(char *);
 extern int remote_mode;
@@ -63,11 +63,58 @@ int main()
     int opcion = -1;
     while(running) 
     {
+        while(remote_mode == 1)
+        {
+            if(!serial_init(B9600))
+            {
+                mostrar_menu_remoto();
+                char command[BUFFER_SIZE];
+                if(serial_read(command, BUFFER_SIZE))
+                {
+                    switch(comando_mp(command))
+                    {
+                    case 1:
+                        secuencias[0].funcion();
+                        break;
+                    case 2:
+                        secuencias[1].funcion();
+                        break;
+                    case 3:
+                        secuencias[2].funcion();
+                        break;
+                    case 4:
+                        secuencias[3].funcion();
+                        break;
+                    case 5:
+                        secuencias[4].funcion();
+                        break;
+                    case 6:
+                        secuencias[5].funcion();
+                        break;
+                    case 7:
+                        secuencias[6].funcion();
+                        break;
+                    case 8:
+                        secuencias[7].funcion();
+                        break;
+                    case 9:
+                        secuencias[8].funcion();
+                        break;
+                    case 0:
+                        remote_mode = 0;
+                        printf("Saliendo de modo remoto...");
+                        serial_close();
+                        sleep(1);
+                        break;
+                    default: break;
+                    }
+                }
+            } 
+        }
         
         opcion = mostrar_menu_secuencias();
         if(opcion == 0)
         {
-            running = 0;
             system("clear");
             printf("SALIENDO....\n");
             running = 0;
@@ -79,7 +126,6 @@ int main()
         
 
     }
-    
     return 0;
 }
 

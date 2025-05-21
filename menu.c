@@ -33,13 +33,15 @@ int mostrar_menu_secuencias()
 
     while (1) 
     {
+        //si modo remoto activado envia M1
         system("clear");
         printf("-----------------------------------\n");
         printf("=== CONTROL DEL SECUENCIAS LED ===\n");
         printf("-----------------------------------\n");
         printf("=== MODO REMOTO [%s]===\n",get_remote_mode());
 
-        for (int i = 0; i < NUM_SECUENCIAS; i++) {
+        for (int i = 0; i < NUM_SECUENCIAS; i++)
+        {
             printf("%d. %s\n", secuencias[i].id, secuencias[i].nombre);
         }
         printf("9. Activar/Desactivar Modo remoto\n");
@@ -77,4 +79,20 @@ int mostrar_menu_secuencias()
     return -1;
 }
 
+void mostrar_menu_remoto(void)
+{
+   while (1) 
+    {
+        serial_send("M1");
+        system("clear");
+        printf("-----------------------------------\n");
+        printf("=== CONTROL DEL SECUENCIAS LED ===\n");
+        printf("-----------------------------------\n");
+        printf("========== MODO REMOTO ===========\n");
 
+        for (int i = 0; i < NUM_SECUENCIAS; i++)
+        {
+            printf("%d. %s\n", secuencias[i].id, secuencias[i].nombre);
+        }
+    } 
+}
