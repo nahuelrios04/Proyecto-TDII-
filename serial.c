@@ -4,28 +4,14 @@
 #include <termios.h>
 #include <unistd.h>
 #include <string.h>
-#include <pthread.h>
+
 #include <stdio.h>
 static int serial_fd = -1;
-static char rx_buffer[BUFFER_SIZE];
-static pthread_mutex_t buffer_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_t rx_thread;
+
+
 int remote_mode = 0;
 // Hilo de recepción (ejecución continua)
-static void* serial_rx_thread(void* arg) {
-    char temp_buf[BUFFER_SIZE];
-    while(1) {
-        int n = read(serial_fd, temp_buf, BUFFER_SIZE-1);
-        if(n > 0) {
-            pthread_mutex_lock(&buffer_mutex);
-            temp_buf[n] = '\0';
-            strncpy(rx_buffer, temp_buf, BUFFER_SIZE);
-            pthread_mutex_unlock(&buffer_mutex);
-        }
-        usleep(1000); // Evitar uso excesivo de CPU
-    }
-    return NULL;
-}
+
 
 int serial_init(int baudrate) {
     struct termios options;
@@ -43,38 +29,36 @@ int serial_init(int baudrate) {
     options.c_cflag &= ~CSTOPB;
     options.c_cflag &= ~CSIZE;
     options.c_cflag |= CS8;
+    options.c_lflag &= ~(ECHO);
     options.c_cc[VMIN]  = 0;
     options.c_cc[VTIME] = 1; // Timeout de 0.1 segundos
 
     tcsetattr(serial_fd, TCSANOW, &options);
 
-    // Crear hilo de recepción
-    pthread_create(&rx_thread, NULL, serial_rx_thread, NULL);
-    
     
     return 0;
 }
 
 void serial_send(const char* data) {
     if(serial_fd >= 0) {
+        printf("[DEBUG]Enviando %s\n",data);
         write(serial_fd, data, strlen(data));
     }
 }
 
 int serial_read(char* buffer, int size) {
-    pthread_mutex_lock(&buffer_mutex);
-    if(rx_buffer[0] != '\0') {
-        strncpy(buffer, rx_buffer, size);
-        rx_buffer[0] = '\0'; // Limpiar buffer
-        pthread_mutex_unlock(&buffer_mutex);
+    fcntl(serial_fd,F_SETFL, O_NONBLOCK);
+    int n = read(serial_fd,buffer,size - 1);
+    if(n > 0)
+    {
+        buffer[n]= '\0';
         return 1;
     }
-    pthread_mutex_unlock(&buffer_mutex);
     return 0;
 }
 
 void serial_close() {
-    pthread_cancel(rx_thread);
+    
     close(serial_fd);
     serial_fd = -1;
 }
@@ -94,6 +78,7 @@ char * get_remote_mode(void)
 
 int comando_mp(char * command)
 {
+    printf("d");
     command[strcspn(command,"\r\n")]='\0';
     if((strcmp(command,"M0")) == 0)
     {

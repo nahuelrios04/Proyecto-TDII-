@@ -89,14 +89,18 @@ int main()
                 }
                 default: break;
             }
-            mostrar_menu_secuencias();
+            //mostrar_menu_secuencias();
             
         }
         
-        char buffer[BUFFER_SIZE];
-        if(remote_mode == 1 && serial_read(buffer,BUFFER_SIZE)==0)
+        printf("*");
+        if(remote_mode)
         {
-            printf("%s",buffer);
+            char buffer[BUFFER_SIZE];
+            if(serial_read(buffer,BUFFER_SIZE))
+            {
+                printf("[DEBUG]Comando recibido %s\n",buffer);
+            }
             switch(comando_mp(buffer))
             {
                 case 1: secuencias[0].funcion(); break;
@@ -117,9 +121,14 @@ int main()
                     running = 0;
                     break;
                 }
+                default:
+                {
+                    printf("[DEBUG] DEFAULT\n ");
+                }
             }
             //mostrar_menu_secuencias();
             memset(buffer,0,BUFFER_SIZE);
+            printf("b");
             delayMillis(100);
         }
     }
