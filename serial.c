@@ -1,4 +1,9 @@
-/* serial_lib.c */
+/*
+ * COMANDOS:
+ *          *M0-M9: Retornan mediante comando_mp() con el respectivo entero M1 return 1;
+ *          *S:  
+ * 
+*/
 #include "serial.h"
 #include <fcntl.h>
 #include <termios.h>
@@ -78,14 +83,12 @@ char * get_remote_mode(void)
 
 int comando_mp(char * command)
 {
-    printf("d");
     command[strcspn(command,"\r\n")]='\0';
     if((strcmp(command,"M0")) == 0)
     {
         return 0;
     }else if((strcmp(command,"M1")) == 0)
     {
-        printf("bbbb");
         return 1;
     }else if((strcmp(command,"M2")) == 0)
     {
@@ -108,5 +111,8 @@ int comando_mp(char * command)
     }else if((strcmp(command,"M8")) == 0)
     {
         return 8;
+    }else if((strcmp(command,"M9")) == 0)
+    {
+        return 9;
     }else return -1;
 }

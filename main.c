@@ -90,16 +90,14 @@ int main()
                 default: break;
             }
             //mostrar_menu_secuencias();
-            
         }
         
-        printf("*");
         if(remote_mode)
         {
             char buffer[BUFFER_SIZE];
             if(serial_read(buffer,BUFFER_SIZE))
             {
-                printf("[DEBUG]Comando recibido %s\n",buffer);
+                
             }
             switch(comando_mp(buffer))
             {
@@ -121,16 +119,14 @@ int main()
                     running = 0;
                     break;
                 }
-                default:
-                {
-                    printf("[DEBUG] DEFAULT\n ");
-                }
+                default: break;
             }
-            //mostrar_menu_secuencias();
+            
             memset(buffer,0,BUFFER_SIZE);
-            printf("b");
-            delayMillis(100);
+            
         }
+        mostrar_menu_secuencias();
+        delayMillis(100);
     }
     serial_close();
     restore_terminal();

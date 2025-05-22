@@ -56,6 +56,7 @@ int verificar_password() {
         printf("Ingrese la contraseña (%d intentos restantes):\n", MAX_ATTEMPTS - intentos);
         printf("Password: ");
         fflush(stdout);
+
         
         tiempo_inicio = time(NULL);
         int pos = 0;

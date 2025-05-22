@@ -21,6 +21,8 @@
 #include "Secuencias.h"
 #include "EasyPIO.h"
 #include "kbhit.h"
+#include "serial.h"
+#include <string.h>
 /////////DEFINE////////////////
 #define LOW 0
 #define HIGH 1
@@ -78,10 +80,9 @@ void el_auto_fantastico()
 	printf("Reproduciendo El auto fantastico...\n");
 	printf("Presiona 'S' para detener. +/- para velocidad\n");
 	configurar_terminal();	//Configuramos terminal no canonico
-	//actualizar_estado("Ejecutando|Auto fantastico|Velocidad:%d",current_delay); VER
 	int currentLed = 0;
 	int direction = 1;
-	
+	int flag = 0;
 	while (1)
 	{
 		// Encendido y apagado de led actual
@@ -102,18 +103,32 @@ void el_auto_fantastico()
 		    apagar_todo();
 		    break;
 		}
-		/*
-		 * 	REVISAR
-		char buffer[20];
-		if(serial_receive(buffer,sizeof(buffer)))
+		
+		
+		if(remote_mode)
 		{
-		    if(buffer[0] == 'V')
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
 		    {
-			current_delay = atoi(buffer+1);
-			actualizar_estado("Ejecutando|Auto fantastico|Velocidad:%d",current_delay);
-		    }
-		}
-		*/
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
+		
 	}
 	restaurar_terminal();	// Restaura modo a modo canonico
 	apagar_todo();		// Apaga los leds	
@@ -131,6 +146,7 @@ void el_choque()
 	printf("Reproduciendo el choque...\n");
 	printf("Presiona 'S' para detener. +/- para velocidad\n");
 	configurar_terminal();
+	int flag = 0;
 	while (1)
 	{
 	    int pos_izq = 0;
@@ -152,14 +168,60 @@ void el_choque()
 	    // Efecto de choque
 	    for (int i = 0; i < 3; i++)
 	    {
-		digitalWrite(LED_PINS[pos_izq], HIGH);
-		digitalWrite(LED_PINS[pos_der], HIGH);
-		delayMillis(100);
-		digitalWrite(LED_PINS[pos_izq], LOW);
-		digitalWrite(LED_PINS[pos_der], LOW);
-		delayMillis(100);
+			digitalWrite(LED_PINS[pos_izq], HIGH);
+			digitalWrite(LED_PINS[pos_der], HIGH);
+			delayMillis(100);
+			digitalWrite(LED_PINS[pos_izq], LOW);
+			digitalWrite(LED_PINS[pos_der], LOW);
+			delayMillis(100);
+			if(remote_mode)
+			{
+				char buffer[BUFFER_SIZE];
+				serial_read(buffer,sizeof(BUFFER_SIZE));
+				buffer[strcspn(buffer,"\r\n")]='\0';
+				if(strcmp(buffer,"V+") == 0)
+				{
+					ajustar_delay('+');
+					//memset(buffer,0,BUFFER_SIZE);
+					
+				}else if(strcmp(buffer,"V-") == 0)
+				{
+					ajustar_delay('-');
+					//memset(buffer,0,BUFFER_SIZE);
+				}else if(strcmp(buffer,"S")== 0)
+				{
+					flag = 1;
+					//memset(buffer,0,BUFFER_SIZE);
+					apagar_todo();
+					break;
+				}else memset(buffer,0,BUFFER_SIZE);
+				memset(buffer,0,BUFFER_SIZE);
+			}if(flag == 1)break;
 	    }
 	    if(chequeo()) break;
+	    if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
 	}
 	restaurar_terminal();	// Restaura modo no canonico
 	apagar_todo();		// Apaga los leds
@@ -205,12 +267,58 @@ void la_carrera()
 			    apagar_todo();
 			    break;
 			}
+			if(remote_mode)
+			{
+				char buffer[BUFFER_SIZE];
+				serial_read(buffer,sizeof(BUFFER_SIZE));
+				buffer[strcspn(buffer,"\r\n")]='\0';
+				if(strcmp(buffer,"V+") == 0)
+				{
+					ajustar_delay('+');
+					//memset(buffer,0,BUFFER_SIZE);
+					
+				}else if(strcmp(buffer,"V-") == 0)
+				{
+					ajustar_delay('-');
+					//memset(buffer,0,BUFFER_SIZE);
+				}else if(strcmp(buffer,"S")== 0)
+				{
+					flag = 1;
+					//memset(buffer,0,BUFFER_SIZE);
+					apagar_todo();
+					break;
+				}else memset(buffer,0,BUFFER_SIZE);
+				memset(buffer,0,BUFFER_SIZE);
+			}if(flag == 1)break;
 		}
 		if(chequeo() || flag == 1)
 		{
 		    apagar_todo();
 		    break;
-		}	
+		}
+		if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;	
 	}
 	restaurar_terminal();	// Restaura modo no canonico
 	apagar_todo();		// Apaga los leds
@@ -243,10 +351,33 @@ void la_apilada()
 			    digitalWrite(LED_PINS[pos],0);
 			    if(chequeo())
 			    {
-				flag = 1;
-				apagar_todo();
-				break;
+					flag = 1;
+					apagar_todo();
+					break;
 			    }
+			    if(remote_mode)
+				{
+					char buffer[BUFFER_SIZE];
+					serial_read(buffer,sizeof(BUFFER_SIZE));
+					buffer[strcspn(buffer,"\r\n")]='\0';
+					if(strcmp(buffer,"V+") == 0)
+					{
+						ajustar_delay('+');
+						//memset(buffer,0,BUFFER_SIZE);
+						
+					}else if(strcmp(buffer,"V-") == 0)
+					{
+						ajustar_delay('-');
+						//memset(buffer,0,BUFFER_SIZE);
+					}else if(strcmp(buffer,"S")== 0)
+					{
+						flag = 1;
+						//memset(buffer,0,BUFFER_SIZE);
+						apagar_todo();
+						break;
+					}else memset(buffer,0,BUFFER_SIZE);
+					memset(buffer,0,BUFFER_SIZE);
+				}if(flag == 1)break;
 			}
 			pos_final = NUM_LEDS - num_led_fijos - 1;
 			for(int i = 0; i < 3 ; i++)
@@ -271,6 +402,29 @@ void la_apilada()
 			    apagar_todo();
 			    break;
 			}
+			if(remote_mode)
+			{
+				char buffer[BUFFER_SIZE];
+				serial_read(buffer,sizeof(BUFFER_SIZE));
+				buffer[strcspn(buffer,"\r\n")]='\0';
+				if(strcmp(buffer,"V+") == 0)
+				{
+					ajustar_delay('+');
+					//memset(buffer,0,BUFFER_SIZE);
+					
+				}else if(strcmp(buffer,"V-") == 0)
+				{
+					ajustar_delay('-');
+					//memset(buffer,0,BUFFER_SIZE);
+				}else if(strcmp(buffer,"S")== 0)
+				{
+					flag = 1;
+					//memset(buffer,0,BUFFER_SIZE);
+					apagar_todo();
+					break;
+				}else memset(buffer,0,BUFFER_SIZE);
+				memset(buffer,0,BUFFER_SIZE);
+			}if(flag == 1)break;
 		}
 		if(flag == 1) break;
 		delayMillis(2000);
@@ -308,38 +462,130 @@ void la_ola()
 		    apagar_todo();
 		    break;
 		}
+		if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
 	    }
 	    
 	    // Ola hacia la izquierda
 	    for(int i = NUM_LEDS-1; i >= 0; i--)
 	    {
-		digitalWrite(LED_PINS[i], HIGH);
-		delayMillis(current_delay);
-		digitalWrite(LED_PINS[i], LOW);
-		if(chequeo())
-		{
-		    flag = 1;
-		    apagar_todo();
-		    break;
-		}
+			digitalWrite(LED_PINS[i], HIGH);
+			delayMillis(current_delay);
+			digitalWrite(LED_PINS[i], LOW);
+			if(chequeo())
+			{
+				flag = 1;
+				apagar_todo();
+				break;
+			}
+			if(remote_mode)
+			{
+				char buffer[BUFFER_SIZE];
+				serial_read(buffer,sizeof(BUFFER_SIZE));
+				buffer[strcspn(buffer,"\r\n")]='\0';
+				if(strcmp(buffer,"V+") == 0)
+				{
+					ajustar_delay('+');
+					//memset(buffer,0,BUFFER_SIZE);
+					
+				}else if(strcmp(buffer,"V-") == 0)
+				{
+					ajustar_delay('-');
+					//memset(buffer,0,BUFFER_SIZE);
+				}else if(strcmp(buffer,"S")== 0)
+				{
+					flag = 1;
+					//memset(buffer,0,BUFFER_SIZE);
+					apagar_todo();
+					break;
+				}else memset(buffer,0,BUFFER_SIZE);
+				memset(buffer,0,BUFFER_SIZE);
+			}if(flag == 1)break;
 	    }
 	    
 	    // Efecto final
 	    for(int i = 0; i < NUM_LEDS; i++)
 	    {
-		digitalWrite(LED_PINS[i], HIGH);
-		if(chequeo())
-		{
-		    flag = 1;
-		    apagar_todo();
-		    break;
-		}
+			digitalWrite(LED_PINS[i], HIGH);
+			if(chequeo())
+			{
+				flag = 1;
+				apagar_todo();
+				break;
+			}
+			if(remote_mode)
+			{
+				char buffer[BUFFER_SIZE];
+				serial_read(buffer,sizeof(BUFFER_SIZE));
+				buffer[strcspn(buffer,"\r\n")]='\0';
+				if(strcmp(buffer,"V+") == 0)
+				{
+					ajustar_delay('+');
+					//memset(buffer,0,BUFFER_SIZE);
+					
+				}else if(strcmp(buffer,"V-") == 0)
+				{
+					ajustar_delay('-');
+					//memset(buffer,0,BUFFER_SIZE);
+				}else if(strcmp(buffer,"S")== 0)
+				{
+					flag = 1;
+					//memset(buffer,0,BUFFER_SIZE);
+					apagar_todo();
+					break;
+				}else memset(buffer,0,BUFFER_SIZE);
+				memset(buffer,0,BUFFER_SIZE);
+			}if(flag == 1)break;
 	    }
 	    if(chequeo() || flag == 1)
 	    {
 		apagar_todo();
 		break;
 	    }
+	    if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
 	    delayMillis(current_delay);
 	    apagar_todo();
 	}
@@ -359,13 +605,13 @@ void el_aleatorio_controlado()
 	system("clear");
 	printf("Ejecutando 'El Aleatorio Controlado'\n");
 	printf("Presiona 'S' para detener. +/- para velocidad\n");
-
+	int flag = 0;
 	while(1)
 	{
 	    // Apagar el LED anterior
 	    if(ultimo_led >= 0)
 	    {
-		digitalWrite(LED_PINS[ultimo_led], LOW);
+			digitalWrite(LED_PINS[ultimo_led], LOW);
 	    }
 
 
@@ -373,17 +619,40 @@ void el_aleatorio_controlado()
 	    int nuevo_led;
 	    do 
 	    {
-		nuevo_led = rand() % NUM_LEDS;
-	    } while(abs(nuevo_led - ultimo_led) <= 1 && NUM_LEDS > 3);
+			nuevo_led = rand() % NUM_LEDS;
+	    }while(abs(nuevo_led - ultimo_led) <= 1 && NUM_LEDS > 3);
 	    
 	    digitalWrite(LED_PINS[nuevo_led], HIGH);
 	    ultimo_led = nuevo_led;
 	    delayMillis(current_delay);
 	    if(chequeo())
 	    {
-		apagar_todo();
-		break;
+			apagar_todo();
+			break;
 	    }
+	    if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
 	}
 	
 	restaurar_terminal();	// Restaura modo no canonico
@@ -408,23 +677,69 @@ void el_binario()
 	    // Contar de 0 a 255 (para 8 LEDs)
 	    for(int num = 0; num < (1 << NUM_LEDS); num++)
 	    {
-		for(int bit = 0; bit < NUM_LEDS; bit++)
-		{
-		    digitalWrite(LED_PINS[bit], (num >> bit) & 0x01);
-		}
-		delayMillis(current_delay);
-		if(chequeo())
-		{
-		    flag = 1;
-		    apagar_todo();
-		    break;
-		}
+			for(int bit = 0; bit < NUM_LEDS; bit++)
+			{
+				digitalWrite(LED_PINS[bit], (num >> bit) & 0x01);
+			}
+			delayMillis(current_delay);
+			if(chequeo())
+			{
+				flag = 1;
+				apagar_todo();
+				break;
+			}
+			if(remote_mode)
+			{
+				char buffer[BUFFER_SIZE];
+				serial_read(buffer,sizeof(BUFFER_SIZE));
+				buffer[strcspn(buffer,"\r\n")]='\0';
+				if(strcmp(buffer,"V+") == 0)
+				{
+					ajustar_delay('+');
+					//memset(buffer,0,BUFFER_SIZE);
+					
+				}else if(strcmp(buffer,"V-") == 0)
+				{
+					ajustar_delay('-');
+					//memset(buffer,0,BUFFER_SIZE);
+				}else if(strcmp(buffer,"S")== 0)
+				{
+					flag = 1;
+					//memset(buffer,0,BUFFER_SIZE);
+					apagar_todo();
+					break;
+				}else memset(buffer,0,BUFFER_SIZE);
+				memset(buffer,0,BUFFER_SIZE);
+			}if(flag == 1)break;
 	    }
 	    if(chequeo() || flag == 1)
 	    {
-		apagar_todo();
-		break;
+			apagar_todo();
+			break;
 	    }
+	    if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
 	}
 	restaurar_terminal();	// Restaura modo no canonico
 	apagar_todo();		// Apaga los leds
@@ -445,14 +760,37 @@ void el_latido()
 	int ciclo_pwm = 0;           // Controla el ciclo de trabajo (0-100)
 	int direccion = 1;            // 1 para aumentar brillo, -1 para disminuir
 	configurar_terminal();        // Modo no canónico
-
+	int flag = 0;
 	while (1)
 	{
 	    if(chequeo())
 	    {
-		apagar_todo();
-		break;
+			apagar_todo();
+			break;
 	    }
+	    if(remote_mode)
+		{
+			char buffer[BUFFER_SIZE];
+			serial_read(buffer,sizeof(BUFFER_SIZE));
+			buffer[strcspn(buffer,"\r\n")]='\0';
+		    if(strcmp(buffer,"V+") == 0)
+		    {
+				ajustar_delay('+');
+				//memset(buffer,0,BUFFER_SIZE);
+				
+		    }else if(strcmp(buffer,"V-") == 0)
+		    {
+				ajustar_delay('-');
+				//memset(buffer,0,BUFFER_SIZE);
+			}else if(strcmp(buffer,"S")== 0)
+			{
+				flag = 1;
+				//memset(buffer,0,BUFFER_SIZE);
+				apagar_todo();
+				break;
+			}else memset(buffer,0,BUFFER_SIZE);
+			memset(buffer,0,BUFFER_SIZE);
+		}if(flag == 1)break;
 
 	    // Actualizar ciclo PWM
 	    ciclo_pwm += direccion * 5;  // Ajusta la velocidad del efecto
@@ -494,12 +832,12 @@ int chequeo()
     */
     if(kbhit())
     {
-	char tecla = leer_tecla();
-	if(tecla == 's' || tecla == 'S')
-	{
-	    return 1;
-	}
-	ajustar_delay(tecla);
+		char tecla = leer_tecla();
+		if(tecla == 's' || tecla == 'S')
+		{
+			return 1;
+		}
+		ajustar_delay(tecla);
     }
     return 0;
 }
