@@ -75,6 +75,8 @@ void el_auto_fantastico()
 	 * 	#Funciones en modo remoto
 	*/
 	system("clear"); 	//Limpiamos pantallas
+	printf("Reproduciendo El auto fantastico...\n");
+	printf("Presiona 'S' para detener. +/- para velocidad\n");
 	configurar_terminal();	//Configuramos terminal no canonico
 	//actualizar_estado("Ejecutando|Auto fantastico|Velocidad:%d",current_delay); VER
 	int currentLed = 0;

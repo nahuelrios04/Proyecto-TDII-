@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <pthread.h>
-
+#include <stdio.h>
 static int serial_fd = -1;
 static char rx_buffer[BUFFER_SIZE];
 static pthread_mutex_t buffer_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -22,7 +22,7 @@ static void* serial_rx_thread(void* arg) {
             strncpy(rx_buffer, temp_buf, BUFFER_SIZE);
             pthread_mutex_unlock(&buffer_mutex);
         }
-        usleep(10000); // Evitar uso excesivo de CPU
+        usleep(1000); // Evitar uso excesivo de CPU
     }
     return NULL;
 }
@@ -50,6 +50,7 @@ int serial_init(int baudrate) {
 
     // Crear hilo de recepción
     pthread_create(&rx_thread, NULL, serial_rx_thread, NULL);
+    
     
     return 0;
 }
@@ -81,7 +82,6 @@ void serial_close() {
 void set_remote_mode(int enable)
 {
     remote_mode = enable;
-    serial_init(B9600);
 }
     
 char * get_remote_mode(void)
@@ -94,11 +94,13 @@ char * get_remote_mode(void)
 
 int comando_mp(char * command)
 {
+    command[strcspn(command,"\r\n")]='\0';
     if((strcmp(command,"M0")) == 0)
     {
         return 0;
     }else if((strcmp(command,"M1")) == 0)
     {
+        printf("bbbb");
         return 1;
     }else if((strcmp(command,"M2")) == 0)
     {

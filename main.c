@@ -57,75 +57,74 @@ int main()
     tcsetattr(STDIN_FILENO, TCSANOW, &original_term);
     pioInit();
     leds_init();
-    
+    serial_init(B9600);
     // Configuración inicial
     set_remote_mode(0); // Iniciar en modo local
-    int opcion = -1;
+    configurar_terminal();
+    mostrar_menu_secuencias();
     while(running) 
     {
-        while(remote_mode == 1)
+        if(kbhit())
         {
-            if(!serial_init(B9600))
+            char tecla = leer_tecla();
+            switch(tecla)
             {
-                mostrar_menu_remoto();
-                char command[BUFFER_SIZE];
-                if(serial_read(command, BUFFER_SIZE))
+                case '1': secuencias[0].funcion(); break;
+                case '2': secuencias[1].funcion(); break;
+                case '3': secuencias[2].funcion(); break;
+                case '4': secuencias[3].funcion(); break;
+                case '5': secuencias[4].funcion(); break;
+                case '6': secuencias[5].funcion(); break;
+                case '7': secuencias[6].funcion(); break;
+                case '8': secuencias[7].funcion(); break;
+                case '9': 
                 {
-                    switch(comando_mp(command))
-                    {
-                    case 1:
-                        secuencias[0].funcion();
-                        break;
-                    case 2:
-                        secuencias[1].funcion();
-                        break;
-                    case 3:
-                        secuencias[2].funcion();
-                        break;
-                    case 4:
-                        secuencias[3].funcion();
-                        break;
-                    case 5:
-                        secuencias[4].funcion();
-                        break;
-                    case 6:
-                        secuencias[5].funcion();
-                        break;
-                    case 7:
-                        secuencias[6].funcion();
-                        break;
-                    case 8:
-                        secuencias[7].funcion();
-                        break;
-                    case 9:
-                        secuencias[8].funcion();
-                        break;
-                    case 0:
-                        remote_mode = 0;
-                        printf("Saliendo de modo remoto...");
-                        serial_close();
-                        sleep(1);
-                        break;
-                    default: break;
-                    }
+                    set_remote_mode(!remote_mode);
+                    break;
                 }
-            } 
+                case '0': 
+                {
+                    running = 0;
+                    break;
+                }
+                default: break;
+            }
+            mostrar_menu_secuencias();
+            
         }
         
-        opcion = mostrar_menu_secuencias();
-        if(opcion == 0)
+        char buffer[BUFFER_SIZE];
+        if(remote_mode == 1 && serial_read(buffer,BUFFER_SIZE)==0)
         {
-            system("clear");
-            printf("SALIENDO....\n");
-            running = 0;
-            break;
-        }else if(opcion <=NUM_SECUENCIAS && opcion > 0)
-        {
-            secuencias[opcion-1].funcion();
+            printf("%s",buffer);
+            switch(comando_mp(buffer))
+            {
+                case 1: secuencias[0].funcion(); break;
+                case 2: secuencias[1].funcion(); break;
+                case 3: secuencias[2].funcion(); break;
+                case 4: secuencias[3].funcion(); break;
+                case 5: secuencias[4].funcion(); break;
+                case 6: secuencias[5].funcion(); break;
+                case 7: secuencias[6].funcion(); break;
+                case 8: secuencias[7].funcion(); break;
+                case 9: 
+                {
+                    set_remote_mode(!remote_mode);
+                    break;
+                }
+                case 0: 
+                {
+                    running = 0;
+                    break;
+                }
+            }
+            //mostrar_menu_secuencias();
+            memset(buffer,0,BUFFER_SIZE);
+            delayMillis(100);
         }
-        
-
     }
+    serial_close();
+    restore_terminal();
     return 0;
 }
 
